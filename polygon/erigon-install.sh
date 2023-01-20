@@ -6,16 +6,7 @@ gover=1.19.4
 erigon=v2.35.2
 
 #dependencies
-sudo apt install -y build-essential bsdmainutils aria2 golang pigz screen clang cmake curl httpie jq nano wget git
-
-#golang
-cd $HOME
-wget "https://golang.org/dl/go$gover.linux-amd64.tar.gz"
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf "go$gover.linux-amd64.tar.gz"
-rm "go$gover.linux-amd64.tar.gz"
-echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> $HOME/.profile
-source $HOME/.profile
+sudo apt install -y build-essential bsdmainutils aria2 pigz screen clang cmake curl httpie jq nano wget git
 
 #erigon
 cd ~
