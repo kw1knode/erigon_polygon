@@ -16,7 +16,7 @@ heimdall=v0.3.x
 
 ## Install Heimdall ***first*** & sync
 ```
-cd polygon
+cd rpc_emporium/polygon
 
 chmod +x heimdall.sh
 
@@ -32,7 +32,7 @@ curl http://localhost:26657/status
 
 ## Install Erigon
 ```
-cd polygon
+cd rpc_emporium/polygon
 
 chmod +x erigon-polygon.sh
 
