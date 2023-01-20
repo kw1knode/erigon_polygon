@@ -1,3 +1,5 @@
+![alt text](https://upload.wikimedia.org/wikipedia/commons/2/24/Polygon_blockchain_logo.png)
+
 ## Edit Version Variables (If needed)
 ```bash
 # erigon
