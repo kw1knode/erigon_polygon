@@ -50,7 +50,7 @@ sudo journalctl -fu heimdalld
 sudo journalctl -fu heimdallr
 ```
 
-## Snapshots 
+# Snapshots 
 https://snapshot.polygon.technology/
 
 ## Stop Erigon
