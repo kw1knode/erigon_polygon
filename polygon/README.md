@@ -1,4 +1,4 @@
-![alt text](https://branditechture.agency/brand-logos/download/polygonmatic/?wpdmdl=1669&refresh=63ca61702dc1e1674207600&ind=1655375350857&filename=Polygon-MATIC.png)
+![alt text](https://uploads-ssl.webflow.com/5f9a1900790900e2b7f25ba1/611f9d12419f2e2b75f158fb_polygon-logo.svg)
 
 # About
 These scripts will install an archival Polygon node. 
