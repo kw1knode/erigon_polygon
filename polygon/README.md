@@ -1,4 +1,4 @@
-![alt text](https://upload.wikimedia.org/wikipedia/commons/2/24/Polygon_blockchain_logo.png)
+![alt text](https://branditechture.agency/brand-logos/download/polygonmatic/?wpdmdl=1669&refresh=63ca61702dc1e1674207600&ind=1655375350857&filename=Polygon-MATIC.png)
 
 ## Edit Version Variables (If needed)
 ```bash
