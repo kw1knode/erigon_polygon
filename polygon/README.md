@@ -1,6 +1,6 @@
 ![alt text](https://branditechture.agency/brand-logos/download/polygonmatic/?wpdmdl=1669&refresh=63ca61702dc1e1674207600&ind=1655375350857&filename=Polygon-MATIC.png)
 
-## About
+# About
 These scripts will install a running version of an archival polygon node. 
 
 ## Edit version variables (your choice)
