@@ -80,5 +80,9 @@ aria2c --file-allocation=none -c -x 10 -s 10 https://matic-blockchain-snapshots.
 ```
 cd /var/lib/erigon
 
-pigz -dc mysql-binary-backup.tar.gz | pv | tar xf -
+pigz -dc my-erigon-snapshot.tar.gz | pv | tar xf -
+
+cd $HOME/.heimdalld/data
+
+pigz -dc my-heimdalld-snapshot.tar.gz | pv | tar xf -
 ```
