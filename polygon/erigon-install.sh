@@ -2,7 +2,6 @@
 #!/bin/bash
 
 #versions
-gover=1.19.4
 erigon=v2.35.2
 
 #dependencies
