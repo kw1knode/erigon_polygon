@@ -69,9 +69,13 @@ sudo rm -r $HOME/.heimdalld/data/*
 ```bash
 # Erigon Mainnet archive snapshot
 
+cd /var/lib/erigon
+
 aria2c --file-allocation=none -c -x 10 -s 10 https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/erigon-archive-snapshot-2023-01-12.tar.gz
 
 # Mainnet Heimdall snapshot 
+
+cd $HOME/.heimdalld/data
 
 aria2c --file-allocation=none -c -x 10 -s 10 https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/heimdall-snapshot-2023-01-10.tar.gz
 ```
