@@ -56,6 +56,8 @@ https://snapshot.polygon.technology/
 ## Stop Erigon
 ```
 sudo systemctl stop erigon
+sudo systemctl stop heimdalld
+sudo systemctl stop heimdallr
 ```
 ## Cleanup Data
 ```
