@@ -60,11 +60,15 @@ sudo systemctl stop erigon
 ## Cleanup Data
 ```
 sudo rm -r /var/lib/erigon/*
+sudo rm -r $HOME/.heimdalld/data/*
 ```
 
 ## Download with Aria2
-```
+```bash
+# Erigon Mainnet archive snapshot
 aria2c --file-allocation=none -c -x 10 -s 10 https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/erigon-archive-snapshot-2023-01-12.tar.gz
+# Mainnet Heimdall snapshot 
+aria2c --file-allocation=none -c -x 10 -s 10 https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/heimdall-snapshot-2023-01-10.tar.gz
 ```
 
 ## Decompress with Pigz
