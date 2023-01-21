@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Exit script if any command fails
+set -e
+
+# Check if user has sudo permissions
+if [[ $(id -u) -ne 0 ]]; then
+    echo "You need to have root privileges to run this script"
+    exit 1
+fi
+
 cd ~
 
 #versions
