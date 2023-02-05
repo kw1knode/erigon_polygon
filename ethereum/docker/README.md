@@ -27,7 +27,7 @@ sudo nano docker-compose.yml
     container_name: erigon-eth
     build:
       args:
-        ERIGON_VER: v2.37.0 # < change me.  match ver v2.37.0 i.e.  *vvv*
+        ERIGON_VER: v2.37.0 # < change me.  match ver i.e. v2.37.0  *vvv*
       context: ./erigon-make
       dockerfile: Dockerfile
     image: erigon/erigon:v2.37.0 # < tag me. match ver i.e. v2.37.0 *^^^*
