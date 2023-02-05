@@ -12,7 +12,7 @@ exec erigon \
       --rpc.batch.concurrency=100 \
       --state.cache=2000000 \
       --http.addr="0.0.0.0" \
-      --http.port="8545" \ 
+      --http.port="8545" \
       --http.api="eth,erigon,web3,net,debug,trace,txpool" \
       --http.vhosts="*" \
       --http.corsdomain="*" \
