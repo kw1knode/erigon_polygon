@@ -6,7 +6,7 @@ WORKDIR /go/src/github.com/ledgerwatch
 RUN git clone --recurse-submodules -j8 https://github.com/ledgerwatch/erigon.git
 
 WORKDIR ./erigon
-RUN git checkout ${ERIGON_VER} && make erigon
+RUN git checkout ${ERIGON_VERSION} && make erigon
 
 FROM alpine:3.13
 RUN apk add --no-cache ca-certificates libstdc++ libgcc
