@@ -41,6 +41,14 @@ services:
       - "30303:30303/udp"
     restart: unless-stopped
     stop_grace_period: 1m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.erigon-eth-stripprefix.stripprefix.prefixes=/eth-archive"
+      - "traefik.http.services.erigon-eth.loadbalancer.server.port=8545"
+      - "traefik.http.routers.erigon-eth.entrypoints=websecure"
+      - "traefik.http.routers.erigon-eth.tls.certresolver=myresolver"
+      - "traefik.http.routers.erigon-eth.rule=Host(`$DOMAIN`) && PathPrefix(`/eth-archive`)"
+      - "traefik.http.routers.erigon-eth.middlewares=erigon-polygon-stripprefix, ipwhitelist"
 
 
 volumes:
