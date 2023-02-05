@@ -31,9 +31,9 @@ services:
     container_name: erigon-eth
     build:
       args:
-        ERIGON_VERSION: v2.37.0
       context: ./erigon-make
       dockerfile: Dockerfile
+    image: erigon/erigon:v2.37.0
     volumes:
       - "erigon:/datadir"
     ports:
