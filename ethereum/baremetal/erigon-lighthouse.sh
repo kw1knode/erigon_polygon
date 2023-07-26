@@ -1,5 +1,7 @@
-### GO
+#!/bin/bash
+apt update -y && apt upgrade -y && apt autoremove -y
 
+### GO
 cd ~
 curl -LO https://go.dev/dl/go1.20.3.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
@@ -7,8 +9,8 @@ sudo tar -C /usr/local -xzf go1.20.3.linux-amd64.tar.gz
 echo 'PATH="$PATH:/usr/local/go/bin"' >> $HOME/.profile
 source $HOME/.profile
 rm go1.20.3.linux-amd64.tar.gz
-### PREREQ
 
+### PREREQ
 sudo apt-get install -y build-essential
 sudo mkdir -p /var/lib/jwtsecret
 openssl rand -hex 32 | sudo tee /var/lib/jwtsecret/jwt.hex > /dev/null
