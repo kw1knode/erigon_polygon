@@ -86,44 +86,43 @@ KillSignal=SIGHUP
 WantedBy=default.target" | sudo tee -a  /etc/systemd/system/erigon.service
 
 #####################################################################################
-################################ INSTALL LIGHTHOUSE #################################
+################################ INSTALL PRYSM ######################################
 #####################################################################################
 
 cd ~
-curl -LO https://github.com/sigp/lighthouse/releases/download/v4.3.0/lighthouse-v4.3.0-x86_64-unknown-linux-gnu.tar.gz
-tar xvf lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-sudo cp lighthouse /usr/local/bin
-rm lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-rm lighthouse
-sudo useradd --no-create-home --shell /bin/false lighthousebeacon
-sudo mkdir -p /var/lib/lighthouse/beacon
-sudo chown -R lighthousebeacon:lighthousebeacon /var/lib/lighthouse/beacon
+curl -LO https://github.com/prysmaticlabs/prysm/releases/download/v4.0.7/beacon-chain-v4.0.7-linux-amd64
+mv beacon-chain-v4.0.1-linux-amd64 beacon-chain
+chmod +x beacon-chain
+sudo cp beacon-chain /usr/local/bin
+rm beacon-chain
+sudo useradd --no-create-home --shell /bin/false prysmbeacon
+sudo mkdir -p /var/lib/prysm/beacon 
+sudo chown -R prysmbeacon:prysmbeacon /var/lib/prysm/beacon
 
 #####################################################################################
-################################ LIGHTHOUSE SERVICE #################################
+################################ PRYSM SERVICE ######################################
 #####################################################################################
 
 echo -e "[Unit]
-Description=Lighthouse Consensus Client (Mainnet)
+Description=Prysm Consensus Client (Mainnet)
 Wants=network-online.target
 After=network-online.target
 [Service]
-User=lighthousebeacon
-Group=lighthousebeacon
+User=prysmbeacon
+Group=prysmbeacon
 Type=simple
 Restart=always
 RestartSec=5
-ExecStart=/usr/local/bin/lighthouse bn \\
-  --network mainnet \\
-  --datadir /var/lib/lighthouse \\
-  --http \\
-  --execution-endpoint http://127.0.0.1:8551 \\
-  --execution-jwt /var/lib/jwtsecret/jwt.hex \\
-  --checkpoint-sync-url https://beaconstate.info \\
-  --genesis-beacon-api-url https://beaconstate.info
-KillSignal=SIGHUP
+ExecStart=/usr/local/bin/beacon-chain \
+  --mainnet \
+  --datadir=/var/lib/prysm/beacon \
+  --execution-endpoint=http://127.0.0.1:8551 \
+  --jwt-secret=/var/lib/jwtsecret/jwt.hex \
+  --checkpoint-sync-url=https://sync-mainnet.beaconcha.in \
+  --genesis-beacon-api-url=https://sync-mainnet.beaconcha.in \
+  --accept-terms-of-use
 [Install]
-WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/lighthouse.service
+WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/prysm.service
 
 #####################################################################################
 ###################################### START ########################################
@@ -133,7 +132,7 @@ sudo systemctl daemon-reload
 sleep 2
 sudo systemctl start erigon
 sleep 10
-sudo systemctl start lighthouse
+sudo systemctl start prysmbeacon
 
 #sudo systemctl enable erigon #START AFTER REBOOT
-#sudo systemctl enable lighthouse #START AFTER REBOOT
+#sudo systemctl enable prysm #START AFTER REBOOT

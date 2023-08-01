@@ -5,7 +5,7 @@
 #####################################################################################
 
 apt update -y && apt upgrade -y && apt autoremove -y
-sudo apt-get install -y build-essential ufw
+sudo apt-get install -y build-essential ufw openjdk-17-jre
 sudo mkdir -p /var/lib/jwtsecret
 openssl rand -hex 32 | sudo tee /var/lib/jwtsecret/jwt.hex > /dev/null
 
@@ -86,44 +86,44 @@ KillSignal=SIGHUP
 WantedBy=default.target" | sudo tee -a  /etc/systemd/system/erigon.service
 
 #####################################################################################
-################################ INSTALL LIGHTHOUSE #################################
+################################## INSTALL TEKU #####################################
 #####################################################################################
 
 cd ~
-curl -LO https://github.com/sigp/lighthouse/releases/download/v4.3.0/lighthouse-v4.3.0-x86_64-unknown-linux-gnu.tar.gz
-tar xvf lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-sudo cp lighthouse /usr/local/bin
-rm lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-rm lighthouse
-sudo useradd --no-create-home --shell /bin/false lighthousebeacon
-sudo mkdir -p /var/lib/lighthouse/beacon
-sudo chown -R lighthousebeacon:lighthousebeacon /var/lib/lighthouse/beacon
+curl -LO https://artifacts.consensys.net/public/teku/raw/names/teku.tar.gz/versions/23.6.2/teku-23.6.2.tar.gz
+tar xvf teku-23.6.2.tar.gz
+sudo cp -a teku-23.6.2 /usr/local/bin/teku
+rm teku-23.3.1.tar.gz
+rm -r teku-23.3.1
+sudo useradd --no-create-home --shell /bin/false teku
+sudo mkdir -p /var/lib/teku
+sudo chown -R teku:teku /var/lib/teku
 
 #####################################################################################
-################################ LIGHTHOUSE SERVICE #################################
+################################# TEKU SERVICE ######################################
 #####################################################################################
 
 echo -e "[Unit]
-Description=Lighthouse Consensus Client (Mainnet)
+Description=Teku Consensus Client (Mainnet)
 Wants=network-online.target
 After=network-online.target
 [Service]
-User=lighthousebeacon
-Group=lighthousebeacon
+User=teku
+Group=teku
 Type=simple
 Restart=always
 RestartSec=5
-ExecStart=/usr/local/bin/lighthouse bn \\
-  --network mainnet \\
-  --datadir /var/lib/lighthouse \\
-  --http \\
-  --execution-endpoint http://127.0.0.1:8551 \\
-  --execution-jwt /var/lib/jwtsecret/jwt.hex \\
-  --checkpoint-sync-url https://beaconstate.info \\
-  --genesis-beacon-api-url https://beaconstate.info
-KillSignal=SIGHUP
+Environment="JAVA_OPTS=-Xmx5g"
+Environment="TEKU_OPTS=-XX:-HeapDumpOnOutOfMemoryError"
+ExecStart=/usr/local/bin/teku/bin/teku \
+  --network=mainnet \
+  --data-path=/var/lib/teku \
+  --ee-endpoint=http://127.0.0.1:8551 \
+  --ee-jwt-secret-file=/var/lib/jwtsecret/jwt.hex \
+  --initial-state=https://sync-mainnet.beaconcha.in \
+  --metrics-enabled=true 
 [Install]
-WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/lighthouse.service
+WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/teku.service
 
 #####################################################################################
 ###################################### START ########################################
@@ -133,7 +133,7 @@ sudo systemctl daemon-reload
 sleep 2
 sudo systemctl start erigon
 sleep 10
-sudo systemctl start lighthouse
+sudo systemctl start teku
 
 #sudo systemctl enable erigon #START AFTER REBOOT
-#sudo systemctl enable lighthouse #START AFTER REBOOT
+#sudo systemctl enable teku #START AFTER REBOOT

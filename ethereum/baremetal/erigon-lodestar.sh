@@ -5,9 +5,16 @@
 #####################################################################################
 
 apt update -y && apt upgrade -y && apt autoremove -y
-sudo apt-get install -y build-essential ufw
+sudo apt-get install -y build-essential ufw git
 sudo mkdir -p /var/lib/jwtsecret
 openssl rand -hex 32 | sudo tee /var/lib/jwtsecret/jwt.hex > /dev/null
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update -y && sudo apt install yarn -y
+
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
 #####################################################################################
 ################################## FIREWALL #########################################
@@ -86,44 +93,44 @@ KillSignal=SIGHUP
 WantedBy=default.target" | sudo tee -a  /etc/systemd/system/erigon.service
 
 #####################################################################################
-################################ INSTALL LIGHTHOUSE #################################
+################################## INSTALL LODESTAR #################################
 #####################################################################################
 
 cd ~
-curl -LO https://github.com/sigp/lighthouse/releases/download/v4.3.0/lighthouse-v4.3.0-x86_64-unknown-linux-gnu.tar.gz
-tar xvf lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-sudo cp lighthouse /usr/local/bin
-rm lighthouse-v4.0.1-x86_64-unknown-linux-gnu.tar.gz
-rm lighthouse
-sudo useradd --no-create-home --shell /bin/false lighthousebeacon
-sudo mkdir -p /var/lib/lighthouse/beacon
-sudo chown -R lighthousebeacon:lighthousebeacon /var/lib/lighthouse/beacon
+git clone https://github.com/chainsafe/lodestar.git
+cd lodestar
+yarn install --ignore-optional --check-files
+yarn run build
+sudo cp -a lodestar /usr/local/bin
+cd ~
+sudo rm -r lodestar
+sudo useradd --no-create-home --shell /bin/false lodestar
+sudo mkdir -p /var/lib/lodestar
+sudo chown -R lodestar:lodestar /var/lib/lodestar
 
 #####################################################################################
-################################ LIGHTHOUSE SERVICE #################################
+################################ LODESTAR SERVICE ###################################
 #####################################################################################
 
 echo -e "[Unit]
-Description=Lighthouse Consensus Client (Mainnet)
+Description=Lodestar Consensus Client (Mainnet)
 Wants=network-online.target
 After=network-online.target
 [Service]
-User=lighthousebeacon
-Group=lighthousebeacon
+User=lodestar
+Group=lodestar
 Type=simple
 Restart=always
 RestartSec=5
-ExecStart=/usr/local/bin/lighthouse bn \\
-  --network mainnet \\
-  --datadir /var/lib/lighthouse \\
-  --http \\
-  --execution-endpoint http://127.0.0.1:8551 \\
-  --execution-jwt /var/lib/jwtsecret/jwt.hex \\
-  --checkpoint-sync-url https://beaconstate.info \\
-  --genesis-beacon-api-url https://beaconstate.info
-KillSignal=SIGHUP
+WorkingDirectory=/usr/local/bin/lodestar
+ExecStart=/usr/local/bin/lodestar/lodestar beacon \
+  --network mainnet \
+  --datadir /var/lib/lodestar \
+  --execution.urls http://127.0.0.1:8551 \
+  --jwt-secret /var/lib/jwtsecret/jwt.hex \
+  --checkpointSyncUrl https://sync-mainnet.beaconcha.in
 [Install]
-WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/lighthouse.service
+WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/lodestar.service
 
 #####################################################################################
 ###################################### START ########################################
@@ -133,7 +140,7 @@ sudo systemctl daemon-reload
 sleep 2
 sudo systemctl start erigon
 sleep 10
-sudo systemctl start lighthouse
+sudo systemctl start lodestar
 
 #sudo systemctl enable erigon #START AFTER REBOOT
-#sudo systemctl enable lighthouse #START AFTER REBOOT
+#sudo systemctl enable lodestar #START AFTER REBOOT
