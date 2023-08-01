@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: always
+    ports:
+    - "443:443"
+    command:
+    - "--api=true"
+    - "--api.insecure=true"
+    - "--api.dashboard=true"
+    - "--log.level=DEBUG"
+    - "--providers.docker=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--entrypoints.websecure.address=:443"
+    - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+    - "--certificatesresolvers.myresolver.acme.email=$EMAIL"
+    - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    volumes:
+    - "traefik_letsencrypt:/letsencrypt"
+    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.middlewares.ipwhitelist.ipwhitelist.sourcerange=$WHITELIST"
+
+  erigon-polygon:
+    build:
+      args:
+        ERIGON_VERSION: v2.48.1
+      context: ./erigon-polygon
+      dockerfile: Dockerfile
+    environment:
+    - SNAPSHOT_URL=${SNAPSHOT_URL:-https://matic-blockchain-snapshots.s3-accelerate.amazonaws.com/matic-mainnet/erigon-archive-snapshot-2023-01-12.tar.gz}
+    - BOOTSTRAP=1
+    - HEIMDALLD=${HEIMDALLD:-http://heimdalld:26657}
+    - HEIMDALLR=${HEIMDALLR:-http://heimdallr:1317}
+    volumes:
+    - "polygon-archive_data:/datadir"
+    ports:
+    - "27113:27113"
+    - "27113:27113/udp"
+    restart: unless-stopped
+    stop_grace_period: 1m
+    labels:
+    - "traefik.enable=true"
+    - "traefik.http.middlewares.erigon-polygon-stripprefix.stripprefix.prefixes=/polygon-archive"
+    - "traefik.http.services.erigon-polygon.loadbalancer.server.port=8545"
+    - "traefik.http.routers.erigon-polygon.entrypoints=websecure"
+    - "traefik.http.routers.erigon-polygon.tls.certresolver=myresolver"
+    - "traefik.http.routers.erigon-polygon.rule=Host(`$DOMAIN`) && PathPrefix(`/polygon-archive`)"
+    - "traefik.http.routers.erigon-polygon.middlewares=erigon-polygon-stripprefix, ipwhitelist"
+
+volumes:
+    polygon-archive_data:
+    traefik_letsencrypt:
