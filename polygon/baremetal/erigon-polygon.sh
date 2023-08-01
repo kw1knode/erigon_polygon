@@ -1,27 +1,36 @@
-
 #!/bin/bash
 
-#versions
-erigon=v2.35.2
+#####################################################################################
+################################## FIREWALL #########################################
+#####################################################################################
 
-#dependencies
-sudo apt install -y build-essential bsdmainutils aria2 pigz screen clang cmake curl httpie jq nano wget git
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 30303 #Allow Erigon P2P
+sudo ufw allow 9000  #Allow Prysm P2P
+sudo ufw allow 22/tcp #Allow SSH
+sudo ufw enable
 
-#erigon
+#####################################################################################
+################################## INSTALL ERIGON ###################################
+#####################################################################################
 cd ~
-curl -LO https://github.com/ledgerwatch/erigon/archive/refs/tags/$erigon.tar.gz
-tar xvf $erigon.tar.gz
-cd erigon-$erigon
+curl -LO https://github.com/ledgerwatch/erigon/archive/refs/tags/v2.48.1.tar.gz
+tar xvf v2.48.1.tar.gz
+cd erigon-2.48.1
 make erigon
 cd ~
-sudo cp -a erigon-$erigon /usr/local/bin/erigon
-rm $erigon.tar.gz
-rm -r erigon-$erigon
+sudo cp -a erigon-2.48.1 /usr/local/bin/erigon
+rm v2.48.1.tar.gz
+rm -r erigon-2.48.1
 sudo useradd --no-create-home --shell /bin/false erigon
 sudo mkdir -p /var/lib/erigon
 sudo chown -R erigon:erigon /var/lib/erigon
 
-#erigon service
+#####################################################################################
+################################# ERIGON SERVICE ####################################
+#####################################################################################
+
 echo -e "[Unit]
 Description=Erigon Polygon Service
 After=network.target
@@ -36,17 +45,17 @@ TimeoutSec=900
 User=root
 Nice=0
 LimitNOFILE=200000
-WorkingDirectory=/root/.local/share/erigon/
-ExecStart=/root/erigon/build/bin/erigon \\
+WorkingDirectory=/usr/local/bin/erigon/
+ExecStart=/usr/local/bin/erigon/build/bin/erigon \\
         --chain=bor-mainnet \\
-        --datadir=/root/.local/share/erigon/datadir \\
-        --ethash.dagdir=/root/.local/share/erigon/datadir/ethash \\
+        --datadir=/var/lib/erigon \\
+        --ethash.dagdir=/var/lib/erigon/ethash \\
         --snapshots=false \\
         --snap.stop \\
         --bor.heimdall=http://localhost:1317 \\
         --http --http.addr=0.0.0.0 --http.port=9656 \\
         --http.compression --http.vhosts=* --http.corsdomain=* \\
-        --http.api=eth,debug,net,trace,web3,erigon,bor \\
+        --http.api=eth,debug,net,trace,web3,erigon,bor \
         --ws --ws.compression \\
         --rpc.gascap=300000000 \\
         --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 \\
@@ -59,8 +68,7 @@ ExecStart=/root/erigon/build/bin/erigon \\
 KillSignal=SIGHUP
 
 [Install]
-WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/erigon.service > /dev/null
+WantedBy=multi-user.target" | sudo tee -a  /etc/systemd/system/erigon.service > /dev/null
+
 
 sudo systemctl daemon-reload
-sudo systemctl enable erigon
-sudo systemctl start erigon
