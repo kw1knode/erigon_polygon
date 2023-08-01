@@ -33,27 +33,31 @@ Type=simple
 Restart=on-failure
 RestartSec=5
 TimeoutSec=900
-User=erigon
+User=root
 Nice=0
 LimitNOFILE=200000
-ExecStart=/usr/local/bin/erigon/build/bin/erigon \\
-  --chain="bor-mainnet" \\
-  --datadir="/var/lib/erigon" \\
-  --ethash.dagdir="/var/lib/erigon/ethash" \\
-  --snapshots="true" \\
-  --bor.heimdall="http://localhost:1317" \\
-  --http --http.addr="0.0.0.0" \\
-  --http.port="8545" \\
-  --http.compression \\ 
-  --http.vhosts="*" \\
-  --http.corsdomain="*" \\
-  --http.api="eth,debug,net,trace,web3,erigon,bor" \\
-  --ws --ws.compression \\
-  --rpc.gascap="300000000" \\
-  --metrics \\
-  --metrics.addr="0.0.0.0" \\
-  --rpc.returndata.limit="500000" \\
-  --metrics.port="9595"
+WorkingDirectory=/root/.local/share/erigon/
+ExecStart=/root/erigon/build/bin/erigon \\
+        --chain=bor-mainnet \\
+        --datadir=/root/.local/share/erigon/datadir \\
+        --ethash.dagdir=/root/.local/share/erigon/datadir/ethash \\
+        --snapshots=false \\
+        --snap.stop \\
+        --bor.heimdall=http://localhost:1317 \\
+        --http --http.addr=0.0.0.0 --http.port=9656 \\
+        --http.compression --http.vhosts=* --http.corsdomain=* \\
+        --http.api=eth,debug,net,trace,web3,erigon,bor \\
+        --ws --ws.compression \\
+        --rpc.gascap=300000000 \\
+        --metrics --metrics.addr=0.0.0.0 --metrics.port=6060 \\
+        --bodies.cache=5G --rpc.batch.limit=200000 \\
+        --db.pagesize=16k \\
+        --batchSize=2048MB \\
+        --p2p.protocol=66 \\
+        --rpc.returndata.limit=1000000
+
+KillSignal=SIGHUP
+
 [Install]
 WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/erigon.service > /dev/null
 
